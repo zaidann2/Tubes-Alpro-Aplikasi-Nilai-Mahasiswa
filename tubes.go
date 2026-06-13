@@ -234,4 +234,328 @@ func tambahMatkul(data *tabMahasiswa, n int) {
 	idx = binarySearchNIM(*data, n, nim)
 
 	if idx != -1 {
-		j = data
+		j = data[idx].JumlahMatkul
+
+		fmt.Print("Nama Mata Kuliah : ")
+		fmt.Scan(&data[idx].Matkul[j].Nama)
+		fmt.Print("SKS : ")
+		fmt.Scan(&data[idx].Matkul[j].SKS)
+		fmt.Print("UTS : ")
+		fmt.Scan(&data[idx].Matkul[j].UTS)
+		fmt.Print("UAS : ")
+		fmt.Scan(&data[idx].Matkul[j].UAS)
+		fmt.Print("Quiz : ")
+		fmt.Scan(&data[idx].Matkul[j].Quiz)
+
+		data[idx].Matkul[j].Total = hitungTotal(
+			data[idx].Matkul[j].UTS,
+			data[idx].Matkul[j].UAS,
+			data[idx].Matkul[j].Quiz)
+
+		data[idx].Matkul[j].Grade = hitungGrade(data[idx].Matkul[j].Total)
+		data[idx].JumlahMatkul++
+		fmt.Println("Mata kuliah berhasil ditambahkan")
+
+	} else {
+		fmt.Println("Mahasiswa tidak ditemukan")
+	}
+}
+
+// cari mahasiswa
+func cariMahasiswa(data tabMahasiswa, n int) {
+	var nama string
+	var idx int
+
+	fmt.Print("Nama : ")
+	fmt.Scan(&nama)
+
+	idx = sequentialSearch(data, n, nama)
+
+	if idx != -1 {
+		fmt.Println("\n===== DATA DITEMUKAN =====")
+		fmt.Println("NIM  :", data[idx].NIM)
+		fmt.Println("Nama :", data[idx].Nama)
+		fmt.Println("=========================")
+	} else {
+		fmt.Println("Data mahasiswa tidak ditemukan")
+	}
+}
+
+// edit mahasiswa
+func editMahasiswa(data *tabMahasiswa, n int) {
+	var nim, namaBaru string
+
+	fmt.Print("NIM : ")
+	fmt.Scan(&nim)
+
+	idx := binarySearchNIM(*data, n, nim)
+
+	if idx != -1 {
+		fmt.Println("Data ditemukan")
+		fmt.Println("Nama lama :", (*data)[idx].Nama)
+
+		fmt.Print("Nama Baru : ")
+		fmt.Scan(&namaBaru)
+
+		(*data)[idx].Nama = namaBaru
+
+		fmt.Println("Data berhasil diubah")
+	} else {
+		fmt.Println("Data tidak ditemukan")
+	}
+}
+
+// hapus mahasiswa
+func hapusMahasiswa(data *tabMahasiswa, n *int) {
+	var nim string
+	var idx, i int
+
+	insertionSortNIM(data, *n)
+
+	fmt.Print("NIM : ")
+	fmt.Scan(&nim)
+
+	idx = binarySearchNIM(*data, *n, nim)
+
+	if idx != -1 {
+		for i = idx; i < *n-1; i++ {
+			data[i] = data[i+1]
+		}
+		*n = *n - 1
+	}
+}
+
+// cetak mahasiswa
+func tampilMahasiswa(data tabMahasiswa, n int) {
+	var i int
+	fmt.Println("==========================================")
+	fmt.Printf("| %-3s | %-15s | %-20s |\n",
+		"No", "NIM", "Nama")
+	fmt.Println("==========================================")
+
+	for i = 0; i < n; i++ {
+		fmt.Printf("| %-3d | %-15s | %-20s |\n",
+			i+1,
+			data[i].NIM,
+			data[i].Nama)
+	}
+	fmt.Println("==========================================")
+}
+
+// cetak nilai mahasiswa
+func tampilTranskrip(data tabMahasiswa, n int) {
+	var nim string
+	var idx, i int
+
+	fmt.Print("NIM : ")
+	fmt.Scan(&nim)
+
+	insertionSortNIM(&data, n)
+	idx = binarySearchNIM(data, n, nim)
+
+	if idx != -1 {
+
+		fmt.Println("\n====================================")
+		fmt.Println("NIM  :", data[idx].NIM)
+		fmt.Println("Nama :", data[idx].Nama)
+		fmt.Println("======================================")
+
+		fmt.Println("================================================================")
+		fmt.Printf("| %-15s | %-3s | %-7s | %-5s |\n",
+			"Mata Kuliah", "SKS", "Total", "Grade")
+		fmt.Println("================================================================")
+
+		for i = 0; i < data[idx].JumlahMatkul; i++ {
+			fmt.Printf("| %-15s | %-3d | %-7.2f | %-5s |\n",
+				data[idx].Matkul[i].Nama,
+				data[idx].Matkul[i].SKS,
+				data[idx].Matkul[i].Total,
+				data[idx].Matkul[i].Grade)
+		}
+
+		fmt.Println("================================================================")
+		fmt.Printf("Total SKS : %d\n", hitungSKS(data[idx]))
+		fmt.Printf("IPK       : %.2f\n", hitungIPK(data[idx]))
+
+	} else {
+		fmt.Println("Mahasiswa tidak ditemukan")
+	}
+}
+
+// Menampilkan hasil pengurutan mahasiswa
+func tampilUrut(data tabMahasiswa, n int) {
+	var i int
+
+	fmt.Println("===================================================================")
+	fmt.Printf("| %-15s | %-15s | %-5s | %-5s |\n",
+		"NIM", "Nama", "SKS", "IPK")
+	fmt.Println("===================================================================")
+
+	for i = 0; i < n; i++ {
+		fmt.Printf("| %-15s | %-15s | %-5d | %-5.2f |\n",
+			data[i].NIM,
+			data[i].Nama,
+			hitungSKS(data[i]),
+			hitungIPK(data[i]))
+	}
+
+	fmt.Println("===================================================================")
+}
+
+func main() {
+	var data tabMahasiswa
+	var n, pilih int
+	var jalan bool
+
+	// Data Dummy
+	data[0].NIM = "103032500111"
+	data[0].Nama = "Andi"
+
+	data[0].Matkul[0] = MataKuliah{"Matdis", 3, 90, 88, 92, 90, "A"}
+	data[0].Matkul[1] = MataKuliah{"Aljabar", 3, 85, 84, 86, 85, "A"}
+	data[0].Matkul[2] = MataKuliah{"Alpro", 3, 88, 87, 89, 88, "A"}
+	data[0].Matkul[3] = MataKuliah{"Agama", 3, 92, 90, 94, 92, "A"}
+	data[0].JumlahMatkul = 4
+
+	data[1].NIM = "103032500122"
+	data[1].Nama = "Budi"
+
+	data[1].Matkul[0] = MataKuliah{"Matdis", 2, 80, 82, 81, 81, "AB"}
+	data[1].Matkul[1] = MataKuliah{"Aljabar", 3, 78, 80, 79, 79, "B"}
+	data[1].Matkul[2] = MataKuliah{"Alpro", 3, 84, 85, 83, 84, "AB"}
+	data[1].Matkul[3] = MataKuliah{"Agama", 2, 88, 87, 89, 88, "A"}
+	data[1].JumlahMatkul = 4
+
+	data[2].NIM = "103032500133"
+	data[2].Nama = "Citra"
+
+	data[2].Matkul[0] = MataKuliah{"Matdis", 4, 75, 76, 77, 76, "B"}
+	data[2].Matkul[1] = MataKuliah{"Aljabar", 4, 70, 72, 71, 71, "B"}
+	data[2].Matkul[2] = MataKuliah{"Alpro", 3, 82, 81, 83, 82, "AB"}
+	data[2].Matkul[3] = MataKuliah{"Agama", 3, 90, 89, 91, 90, "A"}
+	data[2].JumlahMatkul = 4
+
+	data[3].NIM = "103032500144"
+	data[3].Nama = "Deni"
+
+	data[3].Matkul[0] = MataKuliah{"Matdis", 2, 68, 70, 69, 69, "BC"}
+	data[3].Matkul[1] = MataKuliah{"Aljabar", 3, 72, 73, 71, 72, "B"}
+	data[3].Matkul[2] = MataKuliah{"Alpro", 3, 65, 66, 67, 66, "BC"}
+	data[3].Matkul[3] = MataKuliah{"Agama", 3, 80, 82, 81, 81, "AB"}
+	data[3].JumlahMatkul = 4
+
+	data[4].NIM = "103032500155"
+	data[4].Nama = "Eka"
+
+	data[4].Matkul[0] = MataKuliah{"Matdis", 4, 95, 94, 96, 95, "A"}
+	data[4].Matkul[1] = MataKuliah{"Aljabar", 4, 92, 91, 93, 92, "A"}
+	data[4].Matkul[2] = MataKuliah{"Alpro", 4, 90, 89, 91, 90, "A"}
+	data[4].Matkul[3] = MataKuliah{"Agama", 4, 97, 96, 98, 97, "A"}
+	data[4].JumlahMatkul = 4
+
+	data[5].NIM = "103032500166"
+	data[5].Nama = "Farhan"
+
+	data[5].Matkul[0] = MataKuliah{"Matdis", 2, 60, 62, 61, 61, "C"}
+	data[5].Matkul[1] = MataKuliah{"Aljabar", 2, 58, 59, 60, 59, "D"}
+	data[5].Matkul[2] = MataKuliah{"Alpro", 2, 70, 68, 69, 69, "BC"}
+	data[5].Matkul[3] = MataKuliah{"Agama", 2, 75, 76, 74, 75, "B"}
+	data[5].JumlahMatkul = 4
+
+	data[6].NIM = "103032500177"
+	data[6].Nama = "Gita"
+
+	data[6].Matkul[0] = MataKuliah{"Matdis", 3, 85, 86, 84, 85, "A"}
+	data[6].Matkul[1] = MataKuliah{"Aljabar", 3, 83, 82, 84, 83, "AB"}
+	data[6].Matkul[2] = MataKuliah{"Alpro", 4, 78, 80, 79, 79, "B"}
+	data[6].Matkul[3] = MataKuliah{"Agama", 3, 88, 87, 89, 88, "A"}
+	data[6].JumlahMatkul = 4
+
+	data[7].NIM = "103032500188"
+	data[7].Nama = "Hadi"
+
+	data[7].Matkul[0] = MataKuliah{"Matdis", 4, 73, 74, 72, 73, "B"}
+	data[7].Matkul[1] = MataKuliah{"Aljabar", 4, 77, 78, 76, 77, "B"}
+	data[7].Matkul[2] = MataKuliah{"Alpro", 4, 81, 82, 80, 81, "AB"}
+	data[7].Matkul[3] = MataKuliah{"Agama", 3, 86, 87, 85, 86, "A"}
+	data[7].JumlahMatkul = 4
+
+	data[8].NIM = "103032500199"
+	data[8].Nama = "Intan"
+
+	data[8].Matkul[0] = MataKuliah{"Matdis", 2, 55, 57, 56, 56, "D"}
+	data[8].Matkul[1] = MataKuliah{"Aljabar", 2, 62, 61, 63, 62, "C"}
+	data[8].Matkul[2] = MataKuliah{"Alpro", 3, 68, 67, 69, 68, "BC"}
+	data[8].Matkul[3] = MataKuliah{"Agama", 2, 72, 73, 71, 72, "B"}
+	data[8].JumlahMatkul = 4
+
+	n = 9
+
+	jalan = true
+
+	for jalan {
+		fmt.Println("\n======================================")
+		fmt.Println("     APLIKASI NILAI MAHASISWA")
+		fmt.Println("======================================")
+		fmt.Println("1. Tambah Mahasiswa")
+		fmt.Println("2. Tambah Mata Kuliah")
+		fmt.Println("3. Tampilkan Mahasiswa")
+		fmt.Println("4. Tampilkan Transkrip")
+		fmt.Println("5. Cari Mahasiswa")
+		fmt.Println("6. Edit Mahasiswa")
+		fmt.Println("7. Hapus Mahasiswa")
+		fmt.Println("8. Urutkan Mahasiswa")
+		fmt.Println("9. Keluar")
+		fmt.Println("======================================")
+
+		fmt.Print("Pilih : ")
+		fmt.Scan(&pilih)
+
+		if pilih == 1 {
+			tambahMahasiswa(&data, &n)
+		} else if pilih == 2 {
+			tambahMatkul(&data, n)
+		} else if pilih == 3 {
+			tampilMahasiswa(data, n)
+		} else if pilih == 4 {
+			insertionSortNIM(&data, n)
+			tampilTranskrip(data, n)
+		} else if pilih == 5 {
+			cariMahasiswa(data, n)
+		} else if pilih == 6 {
+			editMahasiswa(&data, n)
+		} else if pilih == 7 {
+			hapusMahasiswa(&data, &n)
+		} else if pilih == 8 {
+
+			var pilihUrut int
+
+			fmt.Println("\n===== URUTKAN MAHASISWA =====")
+			fmt.Println("1. IPK Terendah")
+			fmt.Println("2. IPK Tertinggi")
+			fmt.Println("3. SKS Tersedikit")
+			fmt.Println("4. SKS Terbanyak")
+			fmt.Print("Pilih : ")
+			fmt.Scan(&pilihUrut)
+
+			if pilihUrut == 1 {
+				insertionSortIPKAsc(&data, n)
+				tampilUrut(data, n)
+
+			} else if pilihUrut == 2 {
+				insertionSortIPKDesc(&data, n)
+				tampilUrut(data, n)
+
+			} else if pilihUrut == 3 {
+				selectionSortSKSAsc(&data, n)
+				tampilUrut(data, n)
+
+			} else if pilihUrut == 4 {
+				selectionSortSKSDesc(&data, n)
+				tampilUrut(data, n)
+			}
+		} else if pilih == 9 {
+			jalan = false
+		}
+	}
+}
