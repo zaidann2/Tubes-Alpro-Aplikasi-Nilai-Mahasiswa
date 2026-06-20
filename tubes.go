@@ -26,12 +26,10 @@ type Mahasiswa struct {
 
 type tabMahasiswa [nmax]Mahasiswa
 
-// Menghitung nilai total
 func hitungTotal(uts, uas, quiz float64) float64 {
 	return (uts + uas + quiz) / 3
 }
 
-// Menentukan grade
 func hitungGrade(total float64) string {
 	if total >= 85 {
 		return "A"
@@ -49,7 +47,6 @@ func hitungGrade(total float64) string {
 	return "E"
 }
 
-// ubah grade ke bobot
 func bobotGrade(grade string) float64 {
 	if grade == "A" {
 		return 4
@@ -67,7 +64,6 @@ func bobotGrade(grade string) float64 {
 	return 0
 }
 
-// hitung IPK
 func hitungIPK(m Mahasiswa) float64 {
 	var totalMutu float64
 	var totalSKS, i int
@@ -84,7 +80,6 @@ func hitungIPK(m Mahasiswa) float64 {
 	return totalMutu / float64(totalSKS)
 }
 
-// Menghitung total SKS
 func hitungSKS(m Mahasiswa) int {
 	var i, total int
 	for i = 0; i < m.JumlahMatkul; i++ {
@@ -93,7 +88,6 @@ func hitungSKS(m Mahasiswa) int {
 	return total
 }
 
-// Sequential Search nama mahasiswa
 func sequentialSearch(data tabMahasiswa, n int, cari string) int {
 	var i int
 	for i = 0; i < n; i++ {
@@ -104,7 +98,6 @@ func sequentialSearch(data tabMahasiswa, n int, cari string) int {
 	return -1
 }
 
-// Insertion Sort NIM Asc
 func insertionSortNIM(data *tabMahasiswa, n int) {
 	var i, j int
 	var temp Mahasiswa
@@ -121,7 +114,6 @@ func insertionSortNIM(data *tabMahasiswa, n int) {
 	}
 }
 
-// Binary Search NIM
 func binarySearchNIM(data tabMahasiswa, n int, cari string) int {
 	var kiri, kanan, tengah int
 	kiri = 0
@@ -141,7 +133,6 @@ func binarySearchNIM(data tabMahasiswa, n int, cari string) int {
 	return -1
 }
 
-// Insertion Sort IPK Asc
 func insertionSortIPKAsc(data *tabMahasiswa, n int) {
 	var i, j int
 	var temp Mahasiswa
@@ -158,7 +149,6 @@ func insertionSortIPKAsc(data *tabMahasiswa, n int) {
 	}
 }
 
-// Insertion Sort IPK Desc
 func insertionSortIPKDesc(data *tabMahasiswa, n int) {
 	var i, j int
 	var temp Mahasiswa
@@ -175,7 +165,6 @@ func insertionSortIPKDesc(data *tabMahasiswa, n int) {
 	}
 }
 
-// Selection Sort SKS Asc
 func selectionSortSKSAsc(data *tabMahasiswa, n int) {
 	var i, j, idx int
 	var temp Mahasiswa
@@ -193,7 +182,6 @@ func selectionSortSKSAsc(data *tabMahasiswa, n int) {
 	}
 }
 
-// Selection Sort SKS Desc
 func selectionSortSKSDesc(data *tabMahasiswa, n int) {
 	var i, j, idx int
 	var temp Mahasiswa
@@ -211,18 +199,68 @@ func selectionSortSKSDesc(data *tabMahasiswa, n int) {
 	}
 }
 
-// tambah mahasiswa
+func validNama(nama string) bool {
+	if len(nama) == 0 {
+		return false
+	}
+
+	for i := 0; i < len(nama); i++ {
+		if !(nama[i] >= 'A' && nama[i] <= 'Z' ||
+			nama[i] >= 'a' && nama[i] <= 'z' ||
+			nama[i] == ' ') {
+			return false
+		}
+	}
+
+	return true
+}
+
+func validNIM(nim string) bool {
+	if len(nim) != 12 {
+		return false
+	}
+
+	for i := 0; i < len(nim); i++ {
+		if nim[i] < '0' || nim[i] > '9' {
+			return false
+		}
+	}
+
+	return true
+}
+
 func tambahMahasiswa(data *tabMahasiswa, n *int) {
-	fmt.Print("NIM : ")
-	fmt.Scan(&data[*n].NIM)
+	var nama, nim string
+
+	fmt.Print("NIM (12 digit) : ")
+    fmt.Scan(&nim)
+
+    for !validNIM(nim) {
+	    fmt.Println("NIM harus terdiri dari 12 angka!")
+	    fmt.Print("NIM (12 digit) : ")
+	    fmt.Scan(&nim)
+}
+
+	data[*n].NIM = nim
+
 	fmt.Print("Nama : ")
-	fmt.Scan(&data[*n].Nama)
+    fmt.Scan(&nama)
+
+    for !validNama(nama) {
+	    fmt.Println("Nama hanya boleh berisi huruf!")
+	    fmt.Print("Nama : ")
+	    fmt.Scan(&nama)
+}
+
+data[*n].Nama = nama
+
 	*n = *n + 1
+
 	insertionSortNIM(data, *n)
+
 	fmt.Println("Mahasiswa berhasil ditambahkan")
 }
 
-// tambah mata kuliah
 func tambahMatkul(data *tabMahasiswa, n int) {
 	var nim string
 	var idx, j int
@@ -261,7 +299,6 @@ func tambahMatkul(data *tabMahasiswa, n int) {
 	}
 }
 
-// cari mahasiswa
 func cariMahasiswa(data tabMahasiswa, n int) {
 	var nama string
 	var idx int
@@ -281,14 +318,14 @@ func cariMahasiswa(data tabMahasiswa, n int) {
 	}
 }
 
-// edit mahasiswa
 func editMahasiswa(data *tabMahasiswa, n int) {
 	var nim, namaBaru string
+	var idx int
 
 	fmt.Print("NIM : ")
 	fmt.Scan(&nim)
 
-	idx := binarySearchNIM(*data, n, nim)
+	idx = binarySearchNIM(*data, n, nim)
 
 	if idx != -1 {
 		fmt.Println("Data ditemukan")
@@ -305,7 +342,6 @@ func editMahasiswa(data *tabMahasiswa, n int) {
 	}
 }
 
-// hapus mahasiswa
 func hapusMahasiswa(data *tabMahasiswa, n *int) {
 	var nim string
 	var idx, i int
@@ -325,7 +361,6 @@ func hapusMahasiswa(data *tabMahasiswa, n *int) {
 	}
 }
 
-// cetak mahasiswa
 func tampilMahasiswa(data tabMahasiswa, n int) {
 	var i int
 	fmt.Println("==========================================")
@@ -342,7 +377,6 @@ func tampilMahasiswa(data tabMahasiswa, n int) {
 	fmt.Println("==========================================")
 }
 
-// cetak nilai mahasiswa
 func tampilTranskrip(data tabMahasiswa, n int) {
 	var nim string
 	var idx, i int
@@ -382,7 +416,6 @@ func tampilTranskrip(data tabMahasiswa, n int) {
 	}
 }
 
-// Menampilkan hasil pengurutan mahasiswa
 func tampilUrut(data tabMahasiswa, n int) {
 	var i int
 
@@ -407,7 +440,6 @@ func main() {
 	var n, pilih int
 	var jalan bool
 
-	// Data Dummy
 	data[0].NIM = "103032500111"
 	data[0].Nama = "Andi"
 
@@ -510,6 +542,11 @@ func main() {
 
 		fmt.Print("Pilih : ")
 		fmt.Scan(&pilih)
+		for pilih < 1 || pilih > 9 {
+			fmt.Println("Input salah silahkan masukkan ulang!")
+			fmt.Print("Pilih : ")
+			fmt.Scan(&pilih)
+		}
 
 		if pilih == 1 {
 			tambahMahasiswa(&data, &n)
